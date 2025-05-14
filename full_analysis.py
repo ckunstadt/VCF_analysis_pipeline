@@ -33,46 +33,34 @@ def run_call_compare(file1, file2, output):
 def run_compare_to_WT(file1, file2, output):
     subprocess.run(["python", "compare_to_WT.py", "-f1", f"{file1}", "-f2", f"{file2}", "-o", f"{output}"])
 
-
+def run_sort(file, outfile):
+    subprocess.run(f"bcftools sort {file} -o {outfile}", shell=True, check=True)
 
 ###################################################################
 
 
 # THIS ASSUMES FILES ARE GZIPPED AND INDEX AT THE BEGINNING, NOT GREAT TO ASSUME
 run_intersect(args.file1, args.file2, f'{args.name}_initial_shared_homo')
-
-print("1")
 #just get rid of headers somehow before this!!!!
 run_call_compare(f'{args.name}_initial_shared_homo/0002.vcf', f'{args.name}_initial_shared_homo/0003.vcf', f"{args.name}_shared_homo_mut.vcf")
-
-print("2")
 run_compression(f"{args.name}_shared_homo_mut.vcf")
-print("3")
 run_index(f"{args.name}_shared_homo_mut.vcf.gz")
-print("4")
-#print(args.control)
 
 removal_file_list = []
 # now for creating a list of markers to remove
 for i, file in enumerate(args.control): # the args.control needs to be in a list format!!, also the files should all be compressed and indexed by this point
-    print(file)
     run_intersect(f"{args.name}_shared_homo_mut.vcf.gz", file, f"temp_dir_{i}")
-    print("a")
     run_compare_to_WT(f"temp_dir_{i}/0002.vcf", f"temp_dir_{i}/0003.vcf", f"for_removal_{i}.vcf")
-    print("b")
     run_compression(f"for_removal_{i}.vcf")
-    print("c")
     run_index(f"for_removal_{i}.vcf.gz")
-    print("d")
     removal_file_list.append(f"for_removal_{i}.vcf.gz")
 
-
 run_merge(removal_file_list, "full_removal.vcf.gz")
+run_sort("full_removal.vcf.gz", "full_removal_sorted.vcf.gz")
+run_index("full_removal_sorted.vcf.gz")
+run_intersect(f"{args.name}_shared_homo_mut.vcf.gz", "full_removal_sorted.vcf.gz", "final_intersect")
 
-run_intersect(f"{args.name}_shared_homo_mut.vcf.gz", "full_removal.vcf.gz", "final_intersect")
-
-
-
+subprocess.run(["cp", "final_intersect/0000.vcf", f"intronic_and_exonic_{args.name}.vcf"])
 
 
 

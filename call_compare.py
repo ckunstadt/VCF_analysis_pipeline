@@ -45,7 +45,7 @@ with open(args.file1, 'r') as file1, open(args.file2, 'r') as file2, open(args.o
 
         if f1_line == "": # Break if EOF
             break
-        elif f1_line[0] == "#": # Ignore header lines
+        elif f1_line[0] == "#" and f2_line[0] == "#": # Ignore header lines
             outfile.write(f1_line)
             continue
         elif f1_line[0] != "#" and f2_line[0] == "#":
@@ -57,9 +57,10 @@ with open(args.file1, 'r') as file1, open(args.file2, 'r') as file2, open(args.o
         elif f2_line[0] != "#" and f1_line[0] == "#":
             while True:
                 test_line = file1.readline()
-
+                
                 if test_line[0] != "#":
                     break
+                outfile.write(f1_line)
         else:
             f1_list = f1_line.strip().split('\t')
             f2_list = f2_line.strip().split('\t')
