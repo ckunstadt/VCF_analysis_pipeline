@@ -15,27 +15,10 @@ position_list = []
 
 def is_homo(info):
     '''Returns the HOMO value given the INFO value of a vcf line'''
-    info_list = info.strip().split(';')
-    homo_string = info_list[3]
-
-    if int(homo_string[4]) == 0:
-
-        return False
-    elif int(homo_string[4]) == 1:
-
+    if "1/1" in info:
         return True
     else:
-        print("Something is wrong with this VCF or you failed to take something into account")
-
-#subprocess.run(f"grep -v '^#' {args.file1} > {args.file1}.noheader", shell=True)
-#print("WE GOT TO 1")
-#subprocess.run(f"grep -v '^#' {args.file2} > {args.file2}.noheader", shell=True)
-#print("WE GOT TO 2")
-
-#print(f"grep -v '^#' {args.file1} > {args.file1}.noheader")
-#print(f"grep -v '^#' {args.file2} > {args.file2}.noheader")
-
-# could add a wc -l check before this goes on but I think this is fine
+        return False
 
 with open(args.file1, 'r') as file1, open(args.file2, 'r') as file2, open(args.output, 'w') as outfile:
     while True:
@@ -81,7 +64,7 @@ with open(args.file1, 'r') as file1, open(args.file2, 'r') as file2, open(args.o
                 print ("THESE FILES DO NOT HAVE THE SAME SNPS IN THE SAME ORDER!!!")
                 break
 
-            if alt1 == alt2 and alt1 != '.' and alt2 != '.' and is_homo(f1_list[7]) and is_homo(f2_list[7]):
+            if alt1 == alt2 and alt1 != '.' and alt2 != '.' and (is_homo(f1_list[10]) == False) and (is_homo(f2_list[10]) == False):
                 shared_alt_homo_alleles += 1
                 position_list.append([chrom1, pos1, id1])
                 outfile.write(f1_line)

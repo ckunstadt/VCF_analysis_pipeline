@@ -14,8 +14,6 @@ args = parser.parse_args()
 removal_num = 0
 removal_list = []
 
-#subprocess.run(f"grep -v '^#' {args.file1} > {args.file1}.noheader", shell=True)
-#subprocess.run(f"grep -v '^#' {args.file2} > {args.file2}.noheader", shell=True)
 
 with open(args.file1, 'r') as file1, open(args.file2, 'r') as file2, open(args.output, 'w') as outfile:
     while True:
