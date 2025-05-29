@@ -60,9 +60,31 @@ run_sort("full_removal.vcf.gz", "full_removal_sorted.vcf.gz")
 run_index("full_removal_sorted.vcf.gz")
 run_intersect(f"{args.name}_shared_homo_mut.vcf.gz", "full_removal_sorted.vcf.gz", "final_intersect")
 
+# Rename final output file, count calls
 subprocess.run(["cp", "final_intersect/0000.vcf", f"intronic_and_exonic_{args.name}.vcf"])
+final_num = subprocess.run(f'cat intronic_and_exonic_{args.name}.vcf | grep -v ""^#"" | wc -l', shell=True, capture_output=True, text=True)
+print("Homo calls minus controls:" + final_num.stdout.strip())
 
+# Create indel file and get number of indels
+subprocess.run(f"bcftools view --types indels intronic_and_exonic_{args.name}.vcf > intronic_and_exonic_{args.name}_indels.vcf", shell=True, capture_output=True, text=True)
+indel_num = subprocess.run(f"bcftools view --types indels intronic_and_exonic_{args.name}.vcf | grep -v ""^#"" | wc -l", shell=True, capture_output=True, text=True)
+print("Indel Calls:" + indel_num.stdout.strip())
 
+# Create locus (hardcoded, change later) file, count calls
+run_compression(f"intronic_and_exonic_{args.name}.vcf")
+run_index(f"intronic_and_exonic_{args.name}.vcf.gz")
+locus_num = subprocess.run(f"bcftools view -r chr3:78000000-81000000 intronic_and_exonic_{args.name}.vcf.gz | grep -v ""^#"" | wc -l", shell=True, capture_output=True, text=True)
+print("Locus Calls:" + locus_num.stdout.strip())
 
+# Count locus calls from indel file
+run_compression(f"intronic_and_exonic_{args.name}_indels.vcf")
+run_index(f"intronic_and_exonic_{args.name}_indels.vcf.gz")
+indel_locus_num = subprocess.run(f"bcftools view -r chr3:78000000-81000000 intronic_and_exonic_{args.name}_indels.vcf.gz | grep -v ""^#"" | wc -l", shell=True, capture_output=True, text=True)
+print("Indels within locus Calls:" + indel_locus_num.stdout.strip())
 
-
+# Remove junk temporary files
+subprocess.run(f"rm *removal*vcf*", shell=True)
+subprocess.run(f"rm -rf temp_dir*", shell=True)
+subprocess.run(f"rm -rf final_intersect*", shell=True)
+subprocess.run(f'rm -rf *shared_homo*', shell=True)
+subprocess.run(f"rm intronic_and_exonic_{args.name}.vcf.gz*", shell=True)

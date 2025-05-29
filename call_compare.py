@@ -1,5 +1,4 @@
 import argparse
-import subprocess
 # Cameron Kunstadt
 # Etalon Diagnostics
 # May-6-2025
@@ -64,13 +63,13 @@ with open(args.file1, 'r') as file1, open(args.file2, 'r') as file2, open(args.o
                 print ("THESE FILES DO NOT HAVE THE SAME SNPS IN THE SAME ORDER!!!")
                 break
 
-            if alt1 == alt2 and alt1 != '.' and alt2 != '.' and (is_homo(f1_list[10]) == False) and (is_homo(f2_list[10]) == False):
+            if alt1 == alt2 and alt1 != '.' and alt2 != '.' and (is_homo(f1_list[9]) == False) and (is_homo(f2_list[9]) == False):
                 shared_alt_homo_alleles += 1
                 position_list.append([chrom1, pos1, id1])
                 outfile.write(f1_line)
 
 
-print(shared_alt_homo_alleles)
+print("Homo calls shared between files:" + str(shared_alt_homo_alleles))
 
 
 

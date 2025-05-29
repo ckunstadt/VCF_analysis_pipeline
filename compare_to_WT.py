@@ -27,26 +27,17 @@ with open(args.file1, 'r') as file1, open(args.file2, 'r') as file2, open(args.o
             outfile.write(f1_line)
             continue
         elif f1_line[0] != "#" and f2_line[0] == "#":
-            print("got to section 4")
             while True:
                 test_line = file2.readline()
-                print("got to section 5")
                 if test_line[0] != "#":
-                    print("got to section 6")
                     break
         elif f2_line[0] != "#" and f1_line[0] == "#":
             outfile.write(f1_line)
             while True:
-                print("got to section 1")
                 test_line = file1.readline()
-                print(test_line)
                 outfile.write(test_line)
                 if test_line[0] != "#":
-                    print("got to section 2")
-                    break
-                print("got to section 3")
-                
-            
+                    break  
         else:
 
             f1_list = f1_line.strip().split('\t')
